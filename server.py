@@ -29,7 +29,3 @@ def filtered_home():
 def programmer_stories():
     with open("./src/programmer_stories.html", "r") as f:
         return f.read()
-
-@app.route("/lol")
-def lol():
-    return '<h1> hi </h1><p> No... no I dont </p>'
