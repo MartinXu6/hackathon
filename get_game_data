@@ -15,5 +15,4 @@ soup = bs4.BeautifulSoup(get(f"https://steamcharts.com/search/?q={args.substr}")
 out = [x.attrs["href"] for x in soup.find_all("a") if args.substr in x.get_text().lower()]
 url = f"https://www.steamcharts.com{out[0]}"
 df = pd.read_html(get(url).text)[0]
-print(df)
 pd.DataFrame(df).to_csv(args.out_path)
