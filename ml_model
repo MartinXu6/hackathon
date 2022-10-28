@@ -1,0 +1,83 @@
+#!/usr/bin/python
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error
+from sklearn.model_selection import train_test_split
+import numpy as np
+from scipy.optimize import curve_fit
+from scipy import stats
+from copy import copy
+game_model_path="/home/martin/hackathon/python_programs/meme.csv"
+game_data=pd.read_csv(game_model_path,index_col=0)
+y=game_data
+def is_null(s):
+    return s in ['', '%', '-']
+
+def percent_str_to_float(s):
+    if not is_null(s):
+        return float(s[:-1]) / 100
+    else:
+        return np.NaN
+    
+def str_to_float(s):
+    if is_null(s):
+        return np.NaN
+    else:
+        return float(s)
+def month_to_n(s):
+    match s.lower():
+        case "january":
+            return 0
+        case "february":
+            return 1
+        case "march":
+            return 2
+        case "april":
+            return 3
+        case "may":
+            return 4
+        case "june":
+            return 5
+        case "july":
+            return 6
+        case "august":
+            return 7
+        case "september":
+            return 8
+        case "october":
+            return 9
+        case "november":
+            return 10
+        case "december":
+            return 11
+
+def date_to_n(s):
+    month,year=s.split()
+    return (int(year)-2000)*12+month_to_n(month)
+game_data['Avg. Players'] = game_data['Avg. Players'].astype(float)
+game_data['Gain'] = pd.Series(map(str_to_float, game_data['Gain']))
+game_data['% Gain'] = pd.Series(map(percent_str_to_float, game_data['% Gain']))
+game_data=game_data.iloc[1:]
+game_data['Month'] = pd.Series(map(date_to_n, game_data['Month']))
+x = game_data["Month"]
+y = copy(game_data["Avg. Players"])
+y /= y.max()
+x -= x.min()
+x /= x.max()
+
+game_data["Avg. Players"].max(), y.max()
+plt.scatter(x, y)
+plt.title("Players over time")
+plt.xticks([])
+plt.xlabel("Time")
+plt.ylabel("Players")
+plt.plot(x, y)
+plt.savefig('game_plot.png')
+def is_alive():
+    if y.iloc[0] < 0.1:
+        if game_data["Avg. Players"].iloc[0] > 10000:
+            return "not as popular as it used to be, but still barely alive"
+        return "stone dead"
+    return "very much alive"
+print(is_alive())
