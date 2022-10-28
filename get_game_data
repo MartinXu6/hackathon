@@ -1,0 +1,19 @@
+#!/usr/bin/python 
+
+import argparse
+from requests import get
+import bs4
+import pandas as pd
+
+parser = argparse.ArgumentParser(
+                    prog = 'steam_charts url getter',
+                    description = 'given a substring in a game title, it will try find the game')
+parser.add_argument("substr")
+parser.add_argument("out_path")
+args = parser.parse_args()
+soup = bs4.BeautifulSoup(get(f"https://steamcharts.com/search/?q={args.substr}").text, 'html.parser')
+out = [x.attrs["href"] for x in soup.find_all("a") if args.substr in x.get_text().lower()]
+url = f"https://www.steamcharts.com{out[0]}"
+df = pd.read_html(get(url).text)[0]
+print(df)
+pd.DataFrame(df).to_csv(args.out_path)
